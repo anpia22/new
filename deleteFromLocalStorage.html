@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>JS for Beginners</h1>
+    </header>
+
+    <section class="container">
+        <form id="my-form">
+            <h1>Add User</h1>
+            <div class="msg"></div>
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name">
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email">
+            </div>
+            <input type="submit" class="btn" value="submit">
+        </form>
+
+        <ul id="users"></ul>
+
+        <!-- <ul class="items">
+            <li class="item">Item 1</li>
+            <li class="item">Item 2</li>
+            <li class="item">Item 3</li>
+        </ul> -->
+
+    </section>
+
+    <script>
+        const myform = document.getElementById('my-form');
+        const nameInput = document.querySelector('#name');
+        const emailInput = document.querySelector('#email');
+        const msg = document.querySelector('.msg');
+        const userList = document.querySelector('#users');
+
+        // Load items from local storage on page load
+        window.addEventListener('load', () => {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const obj = JSON.parse(localStorage.getItem(key));
+                const li = createListItem(obj.name, obj.email);
+                userList.appendChild(li);
+            }
+        });
+
+        myform.addEventListener('submit', onSubmit);
+        userList.addEventListener('click', onDelete);
+
+        function onSubmit(e) {
+            e.preventDefault();
+            if (nameInput.value === '' || emailInput.value === '') {
+                msg.style.transition = '0.5s';
+                msg.style.backgroundColor = 'red';
+                msg.innerHTML = 'please enter the input field';
+                setTimeout(() => msg.remove(), 3000);
+            }
+            else {
+                const li = createListItem(nameInput.value, emailInput.value);
+                userList.appendChild(li);
+
+                const obj = { 'name': nameInput.value, 'email': emailInput.value };
+                const obj_readAble = JSON.stringify(obj);
+                localStorage.setItem(emailInput.value, obj_readAble);
+
+                nameInput.value = '';
+                emailInput.value = '';
+            }
+        }
+
+        function onDelete(e) {
+            if (e.target.classList.contains('delete')) {
+                const li = e.target.parentElement;
+                const email = li.querySelector('span').textContent;
+                localStorage.removeItem(email);
+                li.remove();
+            }
+        }
+
+        function createListItem(name, email) {
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            const button = document.createElement('button');
+
+            span.appendChild(document.createTextNode(email));
+            button.className = 'delete';
+            button.appendChild(document.createTextNode('delete'));
+
+            li.appendChild(document.createTextNode(`${name}: `));
+            li.appendChild(span);
+            li.appendChild(button);
+
+            return li;
+        }
+
+    </script>
+</body>
+
+</html>
